@@ -3,3 +3,4 @@ dist/
 *.ehpk
 .DS_Store
 public/meal.json
+.env.production

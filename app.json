@@ -6,7 +6,13 @@
   "min_app_version": "2.0.0",
   "min_sdk_version": "0.0.10",
   "entrypoint": "index.html",
-  "permissions": [],
+  "permissions": [
+    {
+      "name": "network",
+      "desc": "今日の食事データ（meal.json）を、自分のPCから読み込む",
+      "whitelist": ["http://<YOUR_TAILSCALE_IP>:5174"]
+    }
+  ],
   "supported_languages": [
     "ja",
     "en"

@@ -13,7 +13,9 @@ type Meal = { date: string; updated: string; target: Pfc; total: Pfc }
 
 async function loadMeal(): Promise<Meal | null> {
   try {
-    const res = await fetch(`/meal.json?t=${Date.now()}`)
+    // 開発中は同じオリジンの /meal.json。パッケージ版は .env.production の VITE_MEAL_URL（git 管理外）
+    const base: string = (import.meta as unknown as { env: Record<string, string | undefined> }).env.VITE_MEAL_URL ?? '/meal.json'
+    const res = await fetch(`${base}?t=${Date.now()}`)
     if (!res.ok) return null
     return (await res.json()) as Meal
   } catch {
