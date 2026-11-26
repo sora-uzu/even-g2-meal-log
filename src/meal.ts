@@ -25,8 +25,31 @@ async function loadMeal(): Promise<Meal | null> {
 
 const n = (v: number) => Math.round(v)
 
+// 端末の現地日付（YYYY-MM-DD）。toISOString は UTC になるので使わない
+function today(): string {
+  const d = new Date()
+  const two = (v: number) => String(v).padStart(2, '0')
+  return `${d.getFullYear()}-${two(d.getMonth() + 1)}-${two(d.getDate())}`
+}
+
+// 残りがマイナスなら「超n」
+const left = (v: number) => (n(v) < 0 ? `超${-n(v)}` : `${n(v)}`)
+
+const HELP = 'タップ＝更新／ダブル＝終了'
+
 function render(m: Meal | null): string {
   if (!m) return '食事ログ\nデータが読めません\nタップで再読み込み'
+  const now = today()
+  // 記録の日付が今日でなければ、古い残りは出さず、目標を出す
+  if (m.date !== now) {
+    return [
+      `食事 ${now.slice(5)}（今日の記録なし）`,
+      `目標 ${n(m.target.kcal)}kcal`,
+      `P ${n(m.target.p)}　F ${n(m.target.f)}　C ${n(m.target.c)}`,
+      `最新の記録 ${m.date.slice(5)}`,
+      HELP,
+    ].join('\n')
+  }
   const r = {
     kcal: m.target.kcal - m.total.kcal,
     p: m.target.p - m.total.p,
@@ -35,10 +58,10 @@ function render(m: Meal | null): string {
   }
   return [
     `食事 ${m.date.slice(5)}（${m.updated}時点）`,
-    `残り ${n(r.kcal)}kcal`,
-    `P ${n(r.p)}　F ${n(r.f)}　C ${n(r.c)}`,
+    n(r.kcal) < 0 ? `超過 ${-n(r.kcal)}kcal` : `残り ${n(r.kcal)}kcal`,
+    `P ${left(r.p)}　F ${left(r.f)}　C ${left(r.c)}`,
     `合計 ${n(m.total.kcal)}kcal`,
-    'タップ＝更新／ダブル＝終了',
+    HELP,
   ].join('\n')
 }
 
